@@ -1,18 +1,24 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { initGenres, setGenres } from '../../../actions/artists';
+import { useSelector, useDispatch } from 'react-redux';
+import { artistsActions } from '../../../reducers/ArtistsReducer';
 
-function LeftPanel({
-  state: { artisList, genersNames, genersChecked },
-  initGenres,
-  setGenres,
-}) {
+export default function LeftPanel() {
+  const dispatch = useDispatch();
+  const genersNames = useSelector((state) => state.artist.genersNames);
+  const genersChecked = useSelector((state) => state.artist.genersChecked);
+  const artisList = useSelector((state) => state.artist.artisList);
+
   const handleOnChange = function (index) {
     const updated = genersChecked.map((elem, i) =>
       i === index ? !elem : elem
     );
-    setGenres(updated);
+
+    dispatch(
+      artistsActions.setGeneresCheck({
+        genersChecked: updated,
+        searchBox: null,
+      })
+    );
   };
 
   useEffect(() => {
@@ -23,7 +29,12 @@ function LeftPanel({
       });
       const genersName = [...set];
       const genersCh = new Array(genersName.length).fill(true);
-      initGenres(genersName, genersCh);
+      dispatch(
+        artistsActions.initGeners({
+          genersNames: genersName,
+          genersChecked: genersCh,
+        })
+      );
     }
   }, [artisList]);
 
@@ -53,13 +64,3 @@ function LeftPanel({
     </div>
   );
 }
-
-LeftPanel.propTypes = {
-  state: PropTypes.object.isRequired,
-  initGenres: PropTypes.func.isRequired,
-  setGenres: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) => ({ state: state });
-
-export default connect(mapStateToProps, { initGenres, setGenres })(LeftPanel);

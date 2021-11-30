@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ArtistInfo from './ArtistInfo';
-import { getArtists, setGenres } from '../../../actions/artists';
-
-function ArtistList({
-  state: { artisList, genersNames, genersChecked, searchBox },
-  getArtists,
-  setGenres,
-}) {
+import {
+  getArtistsAsync,
+  artistsActions,
+} from '../../../reducers/ArtistsReducer';
+export default function ArtistList() {
   const [artists, setArtists] = useState(null);
 
+  const dispatch = useDispatch();
+  const genersNames = useSelector((state) => state.artist.genersNames);
+  const genersChecked = useSelector((state) => state.artist.genersChecked);
+  const artisList = useSelector((state) => state.artist.artisList);
+  const searchBox = useSelector((state) => state.artist.searchBox);
+
   useEffect(() => {
-    getArtists();
-  }, []);
+    dispatch(getArtistsAsync());
+  }, [dispatch]);
 
   useEffect(() => {
     if (searchBox) {
@@ -30,9 +33,11 @@ function ArtistList({
         const index = genersNames.indexOf(name);
         updated[index] = true;
       });
-      setGenres(updated, searchBox);
+      dispatch(
+        artistsActions.setGeneresCheck({ genersChecked: updated, searchBox })
+      );
     }
-  }, [searchBox]);
+  }, [dispatch, searchBox]);
 
   useEffect(() => {
     if (genersChecked && searchBox === null) {
@@ -64,13 +69,3 @@ function ArtistList({
     </div>
   );
 }
-
-ArtistList.propTypes = {
-  state: PropTypes.object.isRequired,
-  getArtists: PropTypes.func.isRequired,
-  setGenres: PropTypes.func.isRequired,
-};
-
-const mapStateToProps = (state) => ({ state: state });
-
-export default connect(mapStateToProps, { getArtists, setGenres })(ArtistList);

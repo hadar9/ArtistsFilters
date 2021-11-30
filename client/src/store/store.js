@@ -1,16 +1,8 @@
-import { createStore, applyMiddleware } from 'redux';
-import { composeWithDevTools } from 'redux-devtools-extension';
-import thunk from 'redux-thunk';
+import { configureStore } from '@reduxjs/toolkit';
 import ArtistsReducer from '../reducers/ArtistsReducer';
 
-const initalState = {};
-
-const middleware = [thunk];
-
-const store = createStore(
-  ArtistsReducer,
-  initalState,
-  composeWithDevTools(applyMiddleware(...middleware))
-);
+const store = configureStore({
+  reducer: { artist: ArtistsReducer },
+});
 
 export default store;

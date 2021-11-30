@@ -1,7 +1,5 @@
-const GET_ARTISTS = 'GET_ARTISTS';
-const INIT_GENERS = 'INIT_GENERS';
-const SET_GENERS_CHECKD = 'SET_GENERS_CHECKD';
-const SEARCH_BOX = 'SEARCH_BOX';
+import { createSlice } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
   artisList: null,
@@ -10,30 +8,38 @@ const initialState = {
   searchBox: '',
 };
 
-export default function ArtistReducer(state = initialState, action) {
-  const { type, payload } = action;
+const ArtistsSlice = createSlice({
+  name: 'artists',
+  initialState,
+  reducers: {
+    getArtists(state, action) {
+      state.artisList = action.payload;
+    },
 
-  switch (type) {
-    case GET_ARTISTS:
-      return { ...state, artisList: payload };
-    case INIT_GENERS:
-      return {
-        ...state,
-        genersNames: payload.genersNames,
-        genersChecked: payload.genersChecked,
-      };
-    case SET_GENERS_CHECKD:
-      return {
-        ...state,
-        genersChecked: payload.genersChecked,
-        searchBox: payload.searchBox,
-      };
-    case SEARCH_BOX:
-      return {
-        ...state,
-        searchBox: payload,
-      };
-    default:
-      return state;
+    initGeners(state, action) {
+      state.genersNames = action.payload.genersNames;
+      state.genersChecked = action.payload.genersChecked;
+    },
+    setGeneresCheck(state, action) {
+      state.genersChecked = action.payload.genersChecked;
+      state.searchBox = action.payload.searchBox;
+    },
+
+    seacrhBox(state, action) {
+      state.searchBox = action.payload;
+    },
+  },
+});
+
+export const getArtistsAsync = () => async (dispatch) => {
+  try {
+    const res = await axios.get('/artists');
+    dispatch(ArtistsSlice.actions.getArtists(res.data));
+  } catch (e) {
+    console.log(e);
   }
-}
+};
+
+export const artistsActions = ArtistsSlice.actions;
+
+export default ArtistsSlice.reducer;

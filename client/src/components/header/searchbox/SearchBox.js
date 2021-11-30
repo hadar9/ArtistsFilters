@@ -1,16 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { debounce } from 'loadsh';
-import { searchB, setGenres } from '../../../actions/artists';
+import { artistsActions } from '../../../reducers/ArtistsReducer';
 
-function SearchBox({ state: { genersNames }, searchB, setGenres }) {
+export default function SearchBox() {
+  const dispatch = useDispatch();
+  const genersNames = useSelector((state) => state.artist.genersNames);
+
   const changeSearch = debounce((text) => {
     if (text) {
-      searchB(text);
+      dispatch(artistsActions.seacrhBox(text));
     } else {
       const genersCh = new Array(genersNames.length).fill(true);
-      setGenres(genersCh);
+      dispatch(
+        artistsActions.setGeneresCheck({
+          genersChecked: genersCh,
+          searchBox: null,
+        })
+      );
     }
   }, 500);
   return (
@@ -22,12 +29,3 @@ function SearchBox({ state: { genersNames }, searchB, setGenres }) {
     </div>
   );
 }
-
-SearchBox.propTypes = {
-  state: PropTypes.object.isRequired,
-  searchB: PropTypes.func.isRequired,
-  setGenres: PropTypes.func.isRequired,
-};
-const mapStateToProps = (state) => ({ state: state });
-
-export default connect(mapStateToProps, { searchB, setGenres })(SearchBox);
